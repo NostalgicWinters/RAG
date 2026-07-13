@@ -36,12 +36,58 @@ def load_documents(docs_path="docs"):
     return documents
 
 
+def split_documents(documents, chunk_size=800, chunk_overlap=0):
+    """Splitting documents into chunks"""
+    print(f"Splitting documents into chumks...")
+
+    text_splitter = CharacterTextSplitter(
+        chunk_size=chunk_size, chunk_overlap=chunk_overlap
+    )
+
+    chunks = text_splitter.split_documents(documents)
+    if chunks:
+        for i, chunk in enumerate(chunks[:5]):
+            print(f"\n--- Chunk {i+1} ---")
+            print(f"Source: {chunk.metadata['source']}")
+            print(f"Length: {len(chunk.page_content)} characters")
+            print(f"Content: ")
+            print(chunk.page_content)
+            print("-" * 50)
+
+        if len(chunks) > 5:
+            print(f"\n... and {len(chunks) - 5} more chunks")
+
+    return chunks
+
+
+def create_vector_store(chunks, persist_directory="db/chroma_db"):
+    """Create and persist ChromaDB vector store"""
+    print("Creating embeddings and storing in ChromaDB...")
+
+    embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+
+    # Create ChromaDB vector store
+    print("--- Creating vector store ---")
+    vectorstore = Chroma.from_documents(
+        documents=chunks,
+        embedding=embedding_model,
+        persist_directory=persist_directory,
+        collection_metadata={"hnsw:space": "cosine"},
+    )
+    print("--- Finished creating vector store ---")
+
+    print(f"Vector store created and saved to {persist_directory}")
+    return vectorstore
+
+
 def main():
     print("Main fucntion.")
     # 1. Load files
-    load_documents()
+    documents = load_documents()
     # 2. Chunking the files
+    chunks = split_documents(documents)
     # 3. Embedding and storing in Vector DB
+    vectorstore = create_vector_store(chunks)
 
 
 if __name__ == "__main__":
