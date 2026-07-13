@@ -2,10 +2,7 @@ import os
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
-from dotenv import load_dotenv
-
-load_dotenv()
+from langchain_ollama import OllamaEmbeddings
 
 
 def load_documents(docs_path="docs"):
@@ -64,7 +61,7 @@ def create_vector_store(chunks, persist_directory="db/chroma_db"):
     """Create and persist ChromaDB vector store"""
     print("Creating embeddings and storing in ChromaDB...")
 
-    embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+    embedding_model = OllamaEmbeddings(model="nomic-embed-text")
 
     # Create ChromaDB vector store
     print("--- Creating vector store ---")
