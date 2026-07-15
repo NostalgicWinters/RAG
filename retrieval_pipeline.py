@@ -13,7 +13,7 @@ db = Chroma(
     collection_metadata={"hnsw": "cosine"},
 )
 
-query = "In what year microsoft became influential in the rise of personal computers through software like Windows?"
+query = "Who is the founder of microsoft?"
 
 retriever = db.as_retriever(search_kwargs={"k": 5})
 
